@@ -1,5 +1,6 @@
 /// <reference types="cypress" />
 
+const { _ } = require("core-js")
 const { chmodSync } = require("fs")
 const { CtrCompleter } = require("ng2-completer")
 
@@ -113,7 +114,7 @@ describe("Our First suite", () => {
     // end of it
   })
 
-  it("invoke command", () => {
+  it.skip("invoke command", () => {
     cy.visit("/");
     cy.contains("Forms").click();
     cy.contains("Form Layouts").click();
@@ -236,7 +237,7 @@ describe("Our First suite", () => {
     // end of it
   })
 
-  it.only("Web tables", () => {
+  it.skip("Web tables", () => {
     cy.visit('/');
     cy.contains('Tables & Data').click();
     cy.contains('Smart Table').click();
@@ -283,5 +284,39 @@ describe("Our First suite", () => {
     // end of it
   });
 
+  it("assert property", () => {
+    cy.visit("/");
+    cy.contains("Forms").click();
+    cy.contains("Datepicker").click();
+
+    let date = new Date();
+    date.setDate(date.getDate() + 2);
+    let futureDay = date.getDate();
+    let futureMonth = date.toLocaleString('default', {month: 'short'});
+    let dateAssert = futureMonth+' '+futureDay+', '+date.getFullYear();
+    
+    cy.contains('nb-card', 'Common Datepicker')
+      .find('input')
+      .then(input => {
+        cy.wrap(input).click();
+        selectDayFromCurrent();
+
+        function selectDayFromCurrent() {
+          cy.get('nb-calendar-navigation')
+          .invoke('attr', 'ng-reflect-date')
+          .then(dateAttribute => {
+            if(!dateAttribute.includes(futureMonth)) {
+              cy.get('[data-name="chevron-right"]').click()
+              cy.get('nb-calendar-day-picker [class="day-cell ng-star-inserted"]').contains(futureDay).click();
+            }
+            else {
+              cy.get('nb-calendar-day-picker [class="day-cell ng-star-inserted"]').contains(futureDay).click();
+            }
+          })
+        }
+      })
+
+    cy.wrap(input).invoke('prop', 'value').should('contain', dateAssert);
+  })
   // end of describe
 })
