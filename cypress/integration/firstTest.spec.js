@@ -122,11 +122,15 @@ describe("Our First suite", () => {
     // 1
     cy.get('[for="exampleInputEmail1"]')
       .should("contain", "Email address")
+      .should('have.class', 'label')
+      .and('have.text', 'Email address');
 
     // 2
     cy.get('[for="exampleInputEmail1"]')
       .then( label => {
         expect(label.text()).to.equal("Email address")
+        expect(label).to.have.class('label')
+        expect(label).to.have.text('Email address')
       });
     
     // 3
@@ -284,7 +288,7 @@ describe("Our First suite", () => {
     // end of it
   });
 
-  it("assert property", () => {
+  it.skip("assert property", () => {
     cy.visit("/");
     cy.contains("Forms").click();
     cy.contains("Datepicker").click();
@@ -317,6 +321,53 @@ describe("Our First suite", () => {
       })
 
     cy.wrap(input).invoke('prop', 'value').should('contain', dateAssert);
+    // cy.wrap(input).should('have.value', dateAssert);
+    // end of it
   })
+
+  it.skip("popup and tooltip", () => {
+    cy.visit('/');
+    cy.contains("Modal & Overlays").click();
+    cy.contains("Tooltip").click();
+
+    cy.contains('nb-card', 'Colored Tooltips')
+      .contains('Default').click();
+    cy.get('nb-tooltip').should('contain', 'This is a tooltip');
+
+  });
+
+  it.skip('dialog box', () => {
+    cy.visit('/');
+    cy.contains('Tables & Data').click();
+    cy.contains('Smart Table').click();
+    // 1
+    // cy.get('tbody tr').first().find('.nb-trash').click()
+    // cy.on('window:confirm', (confirm) => {
+    //   expect(confirm).to.equal('Are you sure you wan to delete?');
+    // })
+
+    // 2
+    // if this window event is not triggered, it will cause error, gives right asssertion 
+    // const stub = cy.stub()
+    // cy.on('window:confirm', stub);
+    // cy.get('tbody tr')
+    //   .first()
+    //   .find('.nb-trash')
+    //   .click()
+    //   .then(() => {
+    //     expect(stub.getCall(0)).to.be.calledWith('Are you sure you wan to delete?')
+    //   })
+
+    // 3 select cancel
+    cy.get('tbody tr').first().find('.nb-trash').click();
+    cy.on('window:confirm', () => false);
+
+    // end of it
+   })
+
+   it("assertions", () => {
+
+   })
+
   // end of describe
 })
